@@ -5,7 +5,7 @@ using static LanguageExt.Prelude;
 
 namespace SchedulerService.DataAccess.Repositories
 {
-    internal class CourseRepository : IReadRepository<CourseEntity>, IWriteRepository<CourseEntity>
+    internal class CourseRepository : IReadRepository<CourseEntity>, IWriteRepository<CourseEntity>, IUpdateRepository<CourseEntity>
     {
         private readonly SchedulerServiceDbContext _context;
 

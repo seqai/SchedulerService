@@ -13,15 +13,18 @@ namespace SchedulerService.Controllers
         private readonly ILogger<CoursesController> _logger;
         private readonly IReadRepository<CourseEntity> _readRepository;
         private readonly IWriteRepository<CourseEntity> _writeRepository;
+        private readonly IUpdateRepository<CourseEntity> _updateRepository;
 
         public CoursesController(
             ILogger<CoursesController> logger,
             IReadRepository<CourseEntity> readRepository,
-            IWriteRepository<CourseEntity> writeRepository)
+            IWriteRepository<CourseEntity> writeRepository,
+            IUpdateRepository<CourseEntity> updateRepository)
         {
             _logger = logger;
             _readRepository = readRepository;
             _writeRepository = writeRepository;
+            _updateRepository = updateRepository;
         }
 
         [HttpGet]
@@ -76,7 +79,8 @@ namespace SchedulerService.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public Task<IActionResult> Put([FromRoute] int id, [FromBody] CourseInputModel model) =>
-            _writeRepository.UpdateAsync(new CourseEntity() { Id = id, Name = model.Name, Length = model.Length })
+            // NB: check schedules and return 409 if length is changed for used schedule or invalidate/change saved schedule
+            _updateRepository.UpdateAsync(new CourseEntity() { Id = id, Name = model.Name, Length = model.Length })
                 .Match(
                     x =>
                     {
