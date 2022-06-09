@@ -8,7 +8,7 @@ namespace SchedulerService.DataAccess
     internal class SchedulerServiceDbContext : DbContext
     {
         public DbSet<CourseEntity> Courses { get; set; } = null!;
-        public DbSet<ScheduleEntity> Schedules { get; set; } = null!;
+        public DbSet<StudyScheduleEntity> Schedules { get; set; } = null!;
 
         private readonly string _connectionString;
 
@@ -25,12 +25,12 @@ namespace SchedulerService.DataAccess
             modelBuilder.Entity<CourseEntity>().Property(x => x.Name).IsRequired();
             modelBuilder.Entity<CourseEntity>().Property(x => x.Length).IsRequired();
 
-            modelBuilder.Entity<ScheduleEntity>().HasKey(x => x.Id);
-            modelBuilder.Entity<ScheduleEntity>().HasIndex(x => x.StudentId);
-            modelBuilder.Entity<ScheduleEntity>().HasMany(x => x.Courses).WithMany(y => y.Schedules).UsingEntity(z => z.ToTable("ScheduleCourses"));
-            modelBuilder.Entity<ScheduleEntity>().HasMany(x => x.Weeks).WithOne().HasForeignKey(x => x.ScheduleId);
+            modelBuilder.Entity<StudyScheduleEntity>().HasKey(x => x.Id);
+            modelBuilder.Entity<StudyScheduleEntity>().HasIndex(x => x.StudentId);
+            modelBuilder.Entity<StudyScheduleEntity>().HasMany(x => x.Courses).WithMany(y => y.Schedules).UsingEntity(z => z.ToTable("ScheduleCourses"));
+            modelBuilder.Entity<StudyScheduleEntity>().HasMany(x => x.Weeks).WithOne().HasForeignKey(x => x.ScheduleId);
 
-            modelBuilder.Entity<StudyWeek>().HasKey(x => new { x.ScheduleId, x.WeekNumber });
+            modelBuilder.Entity<StudyWeekEntity>().HasKey(x => new { x.ScheduleId, x.WeekNumber });
         }
     }
 }

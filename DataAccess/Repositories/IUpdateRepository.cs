@@ -4,6 +4,6 @@ namespace SchedulerService.DataAccess.Repositories
 {
     public interface IUpdateRepository<T>
     {
-        TryOptionAsync<T> UpdateAsync(T entity);
+        TryOptionAsync<int> UpdateAsync(T entity);
     }
 }

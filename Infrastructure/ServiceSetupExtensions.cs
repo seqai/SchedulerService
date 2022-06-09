@@ -4,6 +4,7 @@ using SchedulerService.DataAccess;
 using SchedulerService.DataAccess.Entities;
 using SchedulerService.DataAccess.Repositories;
 using SchedulerService.Infrastructure.Configuration;
+using SchedulerService.Services;
 
 namespace SchedulerService.Infrastructure
 {
@@ -12,12 +13,20 @@ namespace SchedulerService.Infrastructure
         public static void RegisterSchedulerServiceDependencies(this WebApplicationBuilder builder)
         {
             var persistenceConfiguration = builder.Configuration.GetSection("Persistence");
+
             builder.Services.Configure<PersistenceConfiguration>(persistenceConfiguration);
-            builder.Services.AddTransient<SchedulerServiceDbContext>();
+            builder.Services.AddDbContext<SchedulerServiceDbContext>(ServiceLifetime.Scoped);
+
             builder.Services.AddScoped<CourseRepository>();
             builder.Services.AddScoped<IWriteRepository<CourseEntity>>(x => x.GetRequiredService<CourseRepository>());
             builder.Services.AddScoped<IReadRepository<CourseEntity>>(x => x.GetRequiredService<CourseRepository>());
+            builder.Services.AddScoped<IUpdateRepository<CourseEntity>>(x => x.GetRequiredService<CourseRepository>());
 
+            builder.Services.AddScoped<StudyScheduleRepository>();
+            builder.Services.AddScoped<IWriteRepository<StudyScheduleEntity>>(x => x.GetRequiredService<StudyScheduleRepository>());
+            builder.Services.AddScoped<IReadRepository<StudyScheduleEntity>>(x => x.GetRequiredService<StudyScheduleRepository>());
+
+            builder.Services.AddScoped<StudyScheduleService>();
         }
 
         public static void UpdateDatabase(this IApplicationBuilder app)
@@ -38,7 +47,7 @@ namespace SchedulerService.Infrastructure
             {
                 using (context)
                 {
-                    if (context.Courses.Count() > 0)
+                    if (context.Courses.Any())
                     {
                         return;
                     }

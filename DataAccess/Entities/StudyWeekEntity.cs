@@ -1,6 +1,6 @@
 ﻿namespace SchedulerService.DataAccess.Entities
 {
-    public class StudyWeek
+    public class StudyWeekEntity
     {
         public int ScheduleId { get; set; }
         public int WeekNumber { get; set; }

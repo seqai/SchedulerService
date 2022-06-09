@@ -61,7 +61,8 @@ namespace SchedulerService.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public Task<IActionResult> Post([FromBody] CourseInputModel model) => 
             _writeRepository.CreateAsync(new CourseEntity() { Name = model.Name, Length = model.Length })
-            .Match(
+                .Bind(id => _readRepository.GetByIdAsync(id).ToTry(() => throw new Exception($"{nameof(Course)} was created by the repository but could not be retrieved by id: {id}")))
+                .Match(
                 x =>
                 {
                     _logger.LogInformation($"Created {nameof(Course)}: {Course.FromEntity(x)}");
@@ -81,6 +82,7 @@ namespace SchedulerService.Controllers
         public Task<IActionResult> Put([FromRoute] int id, [FromBody] CourseInputModel model) =>
             // NB: check schedules and return 409 if length is changed for used schedule or invalidate/change saved schedule
             _updateRepository.UpdateAsync(new CourseEntity() { Id = id, Name = model.Name, Length = model.Length })
+                .Bind(id => _readRepository.GetByIdAsync(id))
                 .Match(
                     x =>
                     {
