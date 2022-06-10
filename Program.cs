@@ -20,20 +20,19 @@ namespace SchedulerService
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
-
+            
             app.UpdateDatabase();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseAuthorization();
 
             app.MapControllers();
-
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+            
             app.Run();
         }
 

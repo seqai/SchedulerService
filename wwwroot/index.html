@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Study Plan Scheduler Service Demo</title>
+    <script src="js/main.js" defer></script>
+    <style type="text/css">
+        body {
+            font-size: large
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            /* width: 700px; */
+        }
+
+        label {
+            display: block;
+            cursor: pointer;
+        }
+
+        label:after {
+            content: ": ";
+        }
+
+        input[type=number] {
+            width: 50px;    
+        }
+
+        div {
+            margin-bottom: 20px;
+        }
+
+        .inline {
+            display: flex;
+            flex-direction: row;
+        }
+        .inline > div + div {
+            margin-left: 20px;
+        }
+
+        fieldset#courses {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            height: 400px;
+        }
+        
+        $courses > div {
+             flex: 1 1 20px;
+        }
+
+        #courses label {
+            display: inline-block;
+            margin-left: 5px;
+        }
+        #courses label:after {
+            content: "";
+        }
+    </style>
+</head>
+<body>
+<form>
+    <div>
+        <label for="studentId">Student Id</label>
+        <input type="number" id="studentId" name="studentId" min="1">
+    </div>
+    <div class="inline">
+        <div>
+            <label for="startDate">Start Date</label>
+            <input type="date" id="startDate" name="startDate" value="">
+        </div>
+        <div>
+            <label for="endDate">End Date</label>
+            <input type="date" id="endDate" name="endDate">
+        </div>
+    </div>
+    <div>
+        <fieldset id="courses">
+            <legend>Courses</legend>
+
+        </fieldset>
+    </div>
+    <div>
+
+    </div>
+
+</form>
+</body>
+</html>

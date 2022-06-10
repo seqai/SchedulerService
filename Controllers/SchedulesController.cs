@@ -8,7 +8,7 @@ using SchedulerService.Services;
 namespace SchedulerService.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class SchedulesController : ControllerBase
     {
         private readonly ILogger<SchedulesController> _logger;

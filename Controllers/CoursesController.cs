@@ -7,7 +7,7 @@ using SchedulerService.DataAccess.Repositories;
 namespace SchedulerService.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class CoursesController : ControllerBase
     {
         private readonly ILogger<CoursesController> _logger;
