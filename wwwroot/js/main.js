@@ -131,7 +131,7 @@ function prepareRequest(formData) {
         studentId: parseInt(formData.get("studentId")),
         startDate: formData.get("startDate"),
         endDate: formData.get("endDate"),
-        strategy: formData.get("strategy"),
+        calculationStrategy: formData.get("strategy"),
         courseIds: formData.getAll("course").map(x => parseInt(x))
     }
 }

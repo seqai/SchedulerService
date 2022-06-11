@@ -7,13 +7,12 @@
     <style type="text/css">
         body {
             font-size: large;
-            margin-left: 100px;
+            margin: 0 100px;
         }
 
         form {
             display: flex;
             flex-direction: column;
-            /* width: 700px; */
         }
 
         label {
@@ -43,32 +42,46 @@
 
         fieldset#courses {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             flex-wrap: wrap;
-            height: 300px;
+            align-items: flex-start;
+            max-height: 300px;
+            overflow-y: auto;
         }
-        
-        $courses > div {
-             flex: 1 1 15px;
+
+        #courses > div {
+            position: relative;
+            max-width: 100%;
+            display: block;
+            width: 450px;
+        }
+
+        #courses input[type=checkbox] {
+            position: absolute;
         }
 
         fieldset label {
             display: inline-block;
-            margin-left: 5px;
+            padding-left: 25px;
         }
+        
         fieldset label:after {
             content: "";
         }
+        
         #preview {
             background-color: lightgrey;
             padding: 15px;
+            max-width: 300px;
         }
+
         #preview:before {
             content: "Preview Schedule:";
             display: block;
             font-weight: bold;
             margin-bottom: 10px;
         }
+
         #errorMessage {
             background-color: pink;
             color: darkred;
@@ -76,16 +89,23 @@
             font-family: monospace;
             white-space: pre;
         }
+
         #errorMessage:before {
-            content: "Error Occured:";
+            content: "An error occured:";
             display: block;
             font-weight: bold;
             margin-bottom: 10px;
         }
+        
+        #schedule {
+            margin: 0 0 10px 0;
+        }
+
         table, th, td {
             border: 1px solid;
             border-collapse: collapse;
         }
+
         td {
             max-width: 400px;
             overflow: hidden;
@@ -93,21 +113,40 @@
             white-space: nowrap;
             padding: 5px;
         }
+        
         td:last-child {
             font-weight: bold;
             cursor: pointer;
         }
+        
         td:last-child > span {
             color: red;
         }
+        
         button {
             font-size: large;
         }
     </style>
 </head>
 <body>
+<h1>Study Schedule Planner</h1>
+<h2>Saved Schedules</h2>
+<table id="schedule">
+    <thead>
+
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<div id="preview">
+
+</div>
+<div id="errorMessage">
+
+</div>
+<h2>Calculate New Schedule</h2>
 <form onsubmit="submitForm(event)" method="post">
-    <h1>Study Schedule Planner</h1>
     <div>
         <label for="studentId">Student Id</label>
         <input type="number" id="studentId" name="studentId" min="1" onchange="loadSchedules(event)">
@@ -142,20 +181,5 @@
         <button type="submit">Save</button>
     </div>
 </form>
-<div id="preview">
-
-</div>
-<div id="errorMessage">
-
-</div>
-<h2>Saved Schedules</h2>
-<table id="schedule">
-    <thead>
-
-    </thead>
-    <tbody>
-
-    </tbody>
-</table>
 </body>
 </html>

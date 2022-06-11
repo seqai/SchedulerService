@@ -35,7 +35,8 @@ namespace SchedulerService.Business.Calculation
             var result = strategy switch
             {
                 CalculationStrategy.AsFastAsPossible => CalculateGreedy(goalHours, studyHoursPerDayOfWeek),
-                CalculationStrategy.SpreadOut => CalculateSpreadOut(goalHours, studyHoursPerDayOfWeek),
+                CalculationStrategy.SpreadEvenlyNaive => CalculateSpreadNaive(goalHours, studyHoursPerDayOfWeek),
+                CalculationStrategy.SpreadEvenly => CalculateSpread(goalHours, studyHoursPerDayOfWeek),
                 _ => throw new ArgumentOutOfRangeException(nameof(strategy), strategy, null)
             };
 
@@ -65,7 +66,7 @@ namespace SchedulerService.Business.Calculation
             return resultWeeklyStudyHours;
         }
 
-        private static int[] CalculateSpreadOut(int goalHours, int[,] availableHoursPerWeek)
+        private static int[] CalculateSpreadNaive(int goalHours, int[,] availableHoursPerWeek)
         {
             // in current scenario only last and first week can have less that 40 hours available,
             // but in reality schedule might be more complex, so let's assume available hours can have any arbitrary data
@@ -95,6 +96,51 @@ namespace SchedulerService.Business.Calculation
                     }
                 }
 
+                if (hoursBeforeRun == goalHours)
+                {
+                    // Invariant violation
+                    throw new InvalidOperationException("Spread Out Calculation infinite loop");
+                }
+            }
+
+            return resultWeeklyStudyHours;
+        }
+
+        private static int[] CalculateSpread(int goalHours, int[,] availableHoursPerWeek)
+        {
+            // same idea as naive implementation, but potentially achieve the result faster by trying to average the subtract value after each iteration
+            var totalWeeks = availableHoursPerWeek.GetUpperBound(0) + 1;
+            var resultWeeklyStudyHours = new int[totalWeeks];
+            var average = 1;
+
+            while (goalHours > 0)
+            {
+                var availableDays = 0;
+                var hoursBeforeRun = goalHours;
+
+                for (var weekIndex = 0; weekIndex < totalWeeks; ++weekIndex)
+                {
+
+                    for (var dayIndex = 0; dayIndex < 6; ++dayIndex)
+                    {
+                        if (goalHours == 0)
+                        {
+                            return resultWeeklyStudyHours;
+                        }
+
+                        var spentHours = Math.Min(goalHours, Math.Min(availableHoursPerWeek[weekIndex, dayIndex], average));
+                        resultWeeklyStudyHours[weekIndex] += spentHours;
+                        availableHoursPerWeek[weekIndex, dayIndex] -= spentHours;
+                        goalHours -= spentHours;
+
+                        if (availableHoursPerWeek[weekIndex, dayIndex] > 0)
+                        {
+                            availableDays++;
+                        }
+                    }
+                }
+
+                average = Math.Max(1, goalHours / availableDays);
                 if (hoursBeforeRun == goalHours)
                 {
                     // Invariant violation

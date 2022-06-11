@@ -6,7 +6,9 @@ namespace SchedulerService.Business.Calculation
     {
         [Description("As fast as possible")]
         AsFastAsPossible,
-        [Description("Spread out workload evenly")]
-        SpreadOut
+        [Description("Spread the workload evenly (naive)")]
+        SpreadEvenlyNaive,
+        [Description("Spread the workload evenly")]
+        SpreadEvenly
     }
 }
