@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using SchedulerService.Business.Calculation;
 using SchedulerService.Business.Models;
 using SchedulerService.Controllers.InputModels;
 using SchedulerService.DataAccess.Entities;
 using SchedulerService.DataAccess.Repositories;
+using SchedulerService.Infrastructure;
 using SchedulerService.Services;
 
 namespace SchedulerService.Controllers
@@ -32,35 +34,43 @@ namespace SchedulerService.Controllers
         [Route("{id:min(1)}")]
         [ProducesResponseType(typeof(StudySchedule), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> Get(int id) => _readRepository.GetByIdAsync(id)
-            .Match(
-                x => Ok(StudySchedule.FromEntity(x)), 
+        public Task<ActionResult<StudySchedule>> Get(int id) => _readRepository.GetByIdAsync(id)
+            .MatchActionResult(
+                StudySchedule.FromEntity,
                 NotFound, 
                 ex =>
                 {
                     _logger.LogError($"Error in {nameof(SchedulesController)}.{nameof(Get)}: {ex.Message}");
-                    return StatusCode(500) as IActionResult;
+                    return StatusCode(500);
                 });
 
         [HttpGet]
         [Route("")]
         [ProducesResponseType(typeof(List<StudySchedule>), StatusCodes.Status200OK)]
-        public Task<IActionResult> Get(int skip, int take) => _readRepository.GetAsync(skip, take)
-            .Match(
-                x => Ok(x.Select(StudySchedule.FromEntity).ToList()),
+        public Task<ActionResult<List<StudySchedule>>> Get(int skip, int take) => _readRepository.GetAsync(skip, take)
+            .MatchActionResult(
+                x => x.Select(StudySchedule.FromEntity).ToList(),
                 ex =>
                 {
                     _logger.LogError($"Error in {nameof(SchedulesController)}.{nameof(Get)} (Many): {ex.Message}");
-                    return StatusCode(500) as IActionResult;
+                    return StatusCode(500);
                 });
 
+        [HttpGet]
+        [Route("calculation-strategies")]
+        [ProducesResponseType(typeof(List<IdWithDescription<CalculationStrategy>>), StatusCodes.Status200OK)]
+        public ActionResult<List<IdWithDescription<CalculationStrategy>>> Get() => Ok(
+            Enum.GetValues(typeof(CalculationStrategy))
+                .Cast<CalculationStrategy>()
+                .Select(x => new IdWithDescription<CalculationStrategy>(x, x.GetDescription()))
+                .ToList());
 
         [HttpPost]
         [Route("")]
-        [ProducesResponseType(typeof(List<StudySchedule>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(StudySchedule), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public Task<IActionResult> Post([FromBody] ScheduleInputModel model) => 
+        public Task<ActionResult<StudySchedule>> Post([FromBody] ScheduleInputModel model) => 
             _studyScheduleService.CreateSchedule(
                 model.StudentId,
                 model.CourseIds,
@@ -69,11 +79,11 @@ namespace SchedulerService.Controllers
                 model.CalculationStrategy
             )
             .Match(
-                either => either.Match(
+                either => either.MatchActionResult(
                     x =>  
                     {
                         _logger.LogInformation($"Created {nameof(StudySchedule)}: {x}");
-                        return Ok(x) as IActionResult;
+                        return x;
                     },
                     BadRequest
                 ),
@@ -86,10 +96,10 @@ namespace SchedulerService.Controllers
 
         [HttpPost]
         [Route("preview")]
-        [ProducesResponseType(typeof(List<StudySchedule>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(StudySchedule), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public Task<IActionResult> Preview([FromBody] ScheduleInputModel model) =>
+        public Task<ActionResult<StudySchedule>> Preview([FromBody] ScheduleInputModel model) =>
             _studyScheduleService.CalculateSchedule(
                     model.StudentId,
                     model.CourseIds,
@@ -98,10 +108,7 @@ namespace SchedulerService.Controllers
                     model.CalculationStrategy
                 )
                 .Match(
-                    either => either.Match(
-                        x => Ok(x) as IActionResult,
-                        BadRequest
-                    ),
+                    either => either.MatchActionResult(x => x, BadRequest),
                     ex =>
                     {
                         _logger.LogError($"Error in {nameof(SchedulesController)}.{nameof(Post)}: {ex.Message}");
@@ -110,19 +117,19 @@ namespace SchedulerService.Controllers
 
         [HttpDelete]
         [Route("{id:min(1)}")]
-        [ProducesResponseType(typeof(List<StudySchedule>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> Delete([FromRoute] int id) => _writeRepository.DeleteByIdAsync(id)
             .Match(
                 result =>
                 {
                     _logger.LogInformation($"{(result ? "Deleted" : "Attempted to delete non-existing")} {nameof(StudySchedule)} with id {id}");
-                    return NoContent();
+                    return NoContent() as IActionResult;
                 },
                 ex =>
                 {
                     _logger.LogError($"Error in {nameof(SchedulesController)}.{nameof(Delete)}: {ex.Message}");
-                    return StatusCode(500) as IActionResult;
+                    return StatusCode(500);
                 });
         
     }

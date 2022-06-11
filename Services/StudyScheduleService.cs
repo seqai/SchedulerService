@@ -36,7 +36,7 @@ namespace SchedulerService.Services
             string GetMissingIds(IEnumerable<CourseEntity> courses)
             {
                 var existing = courses.Select(x => x.Id).ToHashSet();
-                return string.Join(" ,", courseIds.Where(x => !existing.Contains(x)));
+                return string.Join(", ", courseIds.Where(x => !existing.Contains(x)));
             }
 
             return _courseReadRepository.GetByIdsAsync(courseIds).Map(cs => ((cs.Count == courseIds.Count)

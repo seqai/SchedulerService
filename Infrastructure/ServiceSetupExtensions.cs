@@ -15,16 +15,16 @@ namespace SchedulerService.Infrastructure
             var persistenceConfiguration = builder.Configuration.GetSection("Persistence");
 
             builder.Services.Configure<PersistenceConfiguration>(persistenceConfiguration);
-            builder.Services.AddDbContext<SchedulerServiceDbContext>(ServiceLifetime.Scoped);
+            builder.Services.AddDbContext<SchedulerServiceDbContext>(ServiceLifetime.Transient);
 
-            builder.Services.AddScoped<CourseRepository>();
-            builder.Services.AddScoped<IWriteRepository<CourseEntity>>(x => x.GetRequiredService<CourseRepository>());
-            builder.Services.AddScoped<IReadRepository<CourseEntity>>(x => x.GetRequiredService<CourseRepository>());
-            builder.Services.AddScoped<IUpdateRepository<CourseEntity>>(x => x.GetRequiredService<CourseRepository>());
+            builder.Services.AddTransient<CourseRepository>();
+            builder.Services.AddTransient<IWriteRepository<CourseEntity>>(x => x.GetRequiredService<CourseRepository>());
+            builder.Services.AddTransient<IReadRepository<CourseEntity>>(x => x.GetRequiredService<CourseRepository>());
+            builder.Services.AddTransient<IUpdateRepository<CourseEntity>>(x => x.GetRequiredService<CourseRepository>());
 
-            builder.Services.AddScoped<StudyScheduleRepository>();
-            builder.Services.AddScoped<IWriteRepository<StudyScheduleEntity>>(x => x.GetRequiredService<StudyScheduleRepository>());
-            builder.Services.AddScoped<IReadRepository<StudyScheduleEntity>>(x => x.GetRequiredService<StudyScheduleRepository>());
+            builder.Services.AddTransient<StudyScheduleRepository>();
+            builder.Services.AddTransient<IWriteRepository<StudyScheduleEntity>>(x => x.GetRequiredService<StudyScheduleRepository>());
+            builder.Services.AddTransient<IReadRepository<StudyScheduleEntity>>(x => x.GetRequiredService<StudyScheduleRepository>());
 
             builder.Services.AddScoped<StudyScheduleService>();
         }
