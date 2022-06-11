@@ -3,6 +3,7 @@ using SchedulerService.Business.Calculation;
 using SchedulerService.Business.Models;
 using SchedulerService.Controllers.InputModels;
 using SchedulerService.DataAccess.Entities;
+using SchedulerService.DataAccess.Filters;
 using SchedulerService.DataAccess.Repositories;
 using SchedulerService.Infrastructure;
 using SchedulerService.Services;
@@ -15,17 +16,20 @@ namespace SchedulerService.Controllers
     {
         private readonly ILogger<SchedulesController> _logger;
         private readonly IReadRepository<StudyScheduleEntity> _readRepository;
+        private readonly IFilterRepository<StudyScheduleFilter, StudyScheduleEntity> _filterRepository;
         private readonly IWriteRepository<StudyScheduleEntity> _writeRepository;
         private readonly StudyScheduleService _studyScheduleService;
 
         public SchedulesController(
             ILogger<SchedulesController> logger,
             IReadRepository<StudyScheduleEntity> readRepository, 
+            IFilterRepository<StudyScheduleFilter, StudyScheduleEntity> filterRepository,
             IWriteRepository<StudyScheduleEntity> writeRepository,
             StudyScheduleService studyScheduleService)
         {
             _logger = logger;
             _readRepository = readRepository;
+            _filterRepository = filterRepository;
             _writeRepository = writeRepository;
             _studyScheduleService = studyScheduleService;
         }
@@ -47,7 +51,7 @@ namespace SchedulerService.Controllers
         [HttpGet]
         [Route("")]
         [ProducesResponseType(typeof(List<StudySchedule>), StatusCodes.Status200OK)]
-        public Task<ActionResult<List<StudySchedule>>> Get(int skip, int take) => _readRepository.GetAsync(skip, take)
+        public Task<ActionResult<List<StudySchedule>>> Get([FromQuery(Name = "studentId")] List<int> studentIds, int skip, int take) => _filterRepository.GetFilteredAsync(new StudyScheduleFilter(studentIds), skip, take)
             .MatchActionResult(
                 x => x.Select(StudySchedule.FromEntity).ToList(),
                 ex =>

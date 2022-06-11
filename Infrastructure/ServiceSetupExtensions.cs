@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using SchedulerService.DataAccess;
 using SchedulerService.DataAccess.Entities;
+using SchedulerService.DataAccess.Filters;
 using SchedulerService.DataAccess.Repositories;
 using SchedulerService.Infrastructure.Configuration;
 using SchedulerService.Services;
@@ -25,6 +26,7 @@ namespace SchedulerService.Infrastructure
             builder.Services.AddTransient<StudyScheduleRepository>();
             builder.Services.AddTransient<IWriteRepository<StudyScheduleEntity>>(x => x.GetRequiredService<StudyScheduleRepository>());
             builder.Services.AddTransient<IReadRepository<StudyScheduleEntity>>(x => x.GetRequiredService<StudyScheduleRepository>());
+            builder.Services.AddTransient<IFilterRepository<StudyScheduleFilter, StudyScheduleEntity>>(x => x.GetRequiredService<StudyScheduleRepository>());
 
             builder.Services.AddScoped<StudyScheduleService>();
         }
